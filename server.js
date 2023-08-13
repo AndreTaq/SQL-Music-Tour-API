@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
     })
 })
 
-//band Route 
+//Band Route 
 const bandsController = require('./controllers/bands_controller')
 app.use('/bands', bandsController)
 
