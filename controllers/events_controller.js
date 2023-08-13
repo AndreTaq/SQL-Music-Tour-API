@@ -19,17 +19,53 @@ events.get("/", async (req, res) => {
     }
   });
 
-  //GET ONE EVENT
-  events.get('/:id', async (req, res) => {
+//   //GET ONE EVENT
+//   events.get('/:name', async (req, res) => {
+//     try {
+//         const foundEvent = await Event.findOne({
+//             where: { name: req.params.name }
+//         })
+//         res.status(200).json(foundEvent)
+//     } catch (error) {
+//         res.status(500).json(error)
+//     }
+// });
+
+//* GET ONE EVENT
+events.get("/:name", async (req, res) => {
     try {
-        const foundEvent = await Event.findOne({
-            where: { event_id: req.params.id }
-        })
-        res.status(200).json(foundEvent)
-    } catch (error) {
-        res.status(500).json(error)
+      const foundEvent = await Event.findOne({
+        where: { name: req.params.name },
+        include: [ 
+          { 
+              model: Stage, 
+              as: "stage",
+              include: { 
+                  model: Event, 
+                  as: "event",
+                  where: { name: { 
+                      [Op.like]: `%${req.query.event ? req.query.event : ''}%` 
+                  } }
+              } 
+          },
+          { 
+              model: Set_Time,
+              as: "set_times",
+              include: { 
+                  model: Event, 
+                  as: "event",
+                  where: { name: { 
+                      [Op.like]: `%${req.query.event ? req.query.event : ''}%` 
+                  } }
+              }
+          }
+      ] ,
+      });
+      res.status(200).json(foundEvent);
+    } catch (e) {
+      res.status(500).json(e);
     }
-});
+  });
 
 //CREATE EVENT
 events.post("/", async (req, res) => {
